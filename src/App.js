@@ -7,73 +7,64 @@ import { Container, Content, Row } from "./styles";
 const App = () => {
 
   const [currentNumber, setCurrentNumber] = useState('0')
-  const [firstNumber, setFirstNumber] = useState('0')
-  const [operation, setOperation] = useState('')
+  const [previousNumber, setPreviousNumber] = useState(null);
+  const [operator, setOperator] = useState(null);
 
+  //Reseta calculadora, limpa dados
   const handleOnClear = () => {
     setCurrentNumber('0')
-    setFirstNumber('0')
-    setOperation('')
+    setPreviousNumber('0')
+    setOperator('')
   }
-
-  const hadleAddNunber = (num) => {
+  //Digitacao dos numeros
+  const handleAddNumber = (num) => {
     setCurrentNumber(prev => `${prev === '0' ? '' : prev}${num}`)
   }
 
-  const handleSumNumbers = () => {
-    if (firstNumber === '0') {
-      setFirstNumber(String(currentNumber))
-      setCurrentNumber('0')
-      setOperation('+')
-    } else {
-      const sum = Number(firstNumber) + Number(currentNumber)
-      setCurrentNumber(String(sum))
-      setOperation('')
-    }
+  //Defina a operação (+, -, *, /, %)
+  const handleOperation = (op) => {
+    setPreviousNumber(currentNumber);
+    setCurrentNumber('0');
+    setOperator(op);
   }
-
-  const handleMinusNumbers = () => {
-    if (firstNumber === '0') {
-      setFirstNumber(String(currentNumber))
-      setCurrentNumber('0')
-      setOperation('-')
-    } else {
-      const sum = Number(firstNumber) - Number(currentNumber)
-      setCurrentNumber(String(sum))
-      setOperation('')
-    }
+  //Apaga numero
+  const handleBackspace = () => {
+    setCurrentNumber(prev => prev.length > 1 ? prev.slice(0, -1) : '0');
   }
+  
 
-  const handleTimesNumbers = () => {
-    if (firstNumber === '0') {
-      setFirstNumber(String(currentNumber))
-      setCurrentNumber('0')
-      setOperation('*')
-    } else {
-      const sum = Number(firstNumber) * Number(currentNumber)
-      setCurrentNumber(String(sum))
-      setOperation('')
-    }
-  }
+  //Calculo do resultado
+  const calculateResult = () => {
+    if (operator && previousNumber !== null) {
+      const prev = parseFloat(previousNumber);
+      const current = parseFloat(currentNumber);
+      let result;
 
-  const handleEquals = () => {
-    if (firstNumber !== '0' && operation !== '' && currentNumber !== '0') {
-      switch (operation) {
+      switch (operator) {
         case '+':
-          handleSumNumbers()
-          break
+          result = prev + current;
+          break;
         case '-':
-          handleMinusNumbers()
-          break
+          result = prev - current;
+          break;
         case '*':
-          handleTimesNumbers()
-          break
+          result = prev * current;
+          break;
+        case '/':
+          result = current !== 0 ? prev / current : 'Erro';
+          break;
+        case '%':
+          result = prev % current;
+          break;
         default:
-          break
+          return;
       }
+
+      setCurrentNumber(result.toString());
+      setPreviousNumber(null);
+      setOperator(null);
     }
   }
-
 
   return (
     <Container>
@@ -81,33 +72,33 @@ const App = () => {
         <Input value={currentNumber} />
         <Row>
           <Button label="C" onClick={handleOnClear} />
-          <Button label="<-" onClick={() => hadleAddNunber('')} />
-          <Button label="%" onClick={() => hadleAddNunber('%')} />
-          <Button label="/" onClick={() => hadleAddNunber('/')} />
+          <Button label="<-" onClick={handleBackspace}  />
+          <Button label="%" onClick={() => handleOperation('%')} />
+          <Button label="/" onClick={() => handleOperation('/')} />
         </Row>
         <Row>
-          <Button label="7" onClick={() => hadleAddNunber('7')} />
-          <Button label="8" onClick={() => hadleAddNunber('8')} />
-          <Button label="9" onClick={() => hadleAddNunber('9')} />
-          <Button label="x" onClick={handleTimesNumbers} />
+          <Button label="7" onClick={() => handleAddNumber('7')} />
+          <Button label="8" onClick={() => handleAddNumber('8')} />
+          <Button label="9" onClick={() => handleAddNumber('9')} />
+          <Button label="x" onClick={() => handleOperation('*')} />
         </Row>
         <Row>
-          <Button label="4" onClick={() => hadleAddNunber('4')} />
-          <Button label="5" onClick={() => hadleAddNunber('5')} />
-          <Button label="6" onClick={() => hadleAddNunber('6')} />
-          <Button label="-" onClick={handleMinusNumbers} />
+          <Button label="4" onClick={() => handleAddNumber('4')} />
+          <Button label="5" onClick={() => handleAddNumber('5')} />
+          <Button label="6" onClick={() => handleAddNumber('6')} />
+          <Button label="-" onClick={() => handleOperation('-')} />
         </Row>
         <Row>
-          <Button label="1" onClick={() => hadleAddNunber('1')} />
-          <Button label="2" onClick={() => hadleAddNunber('2')} />
-          <Button label="3" onClick={() => hadleAddNunber('3')} />
-          <Button label="+" onClick={handleSumNumbers} />
+          <Button label="1" onClick={() => handleAddNumber('1')} />
+          <Button label="2" onClick={() => handleAddNumber('2')} />
+          <Button label="3" onClick={() => handleAddNumber('3')} />
+          <Button label="+" onClick={() => handleOperation('+')} />
         </Row>
         <Row>
-          <Button label="+/-" onClick={() => hadleAddNunber('')} />
-          <Button label="0" onClick={() => hadleAddNunber('0')} />
-          <Button label="," onClick={() => hadleAddNunber(',')} />
-          <Button label="=" onClick={handleEquals} />
+          <Button label="0" onClick={() => handleAddNumber('0')} />
+          <Button label="00" onClick={() => handleAddNumber('00')} />
+          <Button label="." onClick={() => handleAddNumber('.')} />
+          <Button label="=" onClick={calculateResult} />
         </Row>
 
       </Content>
